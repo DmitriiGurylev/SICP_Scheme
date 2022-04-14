@@ -1,21 +1,30 @@
 #lang racket
 
-(define (square n) (* n n))
-(define (runtime) (current-inexact-milliseconds))
+(define
+  (search-for-prime from how-many)
+  (search from how-many)
+)
 
-(define (timed-prime-test n)
-  (start-prime-test n (runtime)))
+(define
+  (search from how-many)
+  (if (= how-many 0)
+      (display "Task done")
+      (if (odd? from) 
+          (if (timed-prime-test from)
+               (search (+ 2 from) (- how-many 1))
+               (search (+ 2 from) how-many))
+          (search (+ 1 from) how-many))))
 
-(define (start-prime-test n start-time)
-  (if (fast-prime? n (- n 1))
-      (report-prime n (- (runtime) start-time))
-      false))
+(define (fermat-test n)
+  (define (try-it a)
+    (= (expmod a n n) a))
+  (try-it (+ 1 (random (- n 1)))))
 
-(define (report-prime n elapsed-time)
-  (display n)
-  (display " *** ")
-  (display elapsed-time)
-  (newline))
+(define (fast-prime? n times)
+  (cond
+    ((= times 0) true)
+    ((fermat-test n) (fast-prime? n (- times 1)))
+    (else false)))
 
 (define (expmod base exp m)
   (cond ((= exp 0) 1)
@@ -26,22 +35,21 @@
          (remainder (* base (expmod base (- exp 1) m))
           m))))
 
-(define (fermat-test n)
-  (define (try-it a)
-    (= (expmod a n n) a))
-  (try-it (+ 1 (random (- n 1)))))
+(define (square n) (* n n))
 
-(define (fast-prime? n times)
-  (cond ((= times 0) true)
-        ((fermat-test n) (fast-prime? n (- times 1)))
-        (else false)))
+(define
+  (timed-prime-test n)
+  (start-prime-test n (runtime)))
 
-(define (search-for-primes start-value how-many-values?)
-  (if (= how-many-values? 0)
-      (display "Task have done")
-      (if (odd? start-value)
-          (if (timed-prime-test start-value)
-              (search-for-primes (+ 2 start-value) (- how-many-values? 1))
-              (search-for-primes (+ 2 start-value) how-many-values?))
-          (search-for-primes (+ 1 start-value) how-many-values?))))
+(define (start-prime-test n start-time)
+  (if (fast-prime? n (- n 1))
+      (report-prime n (- (runtime) start-time))
+      false))
 
+(define (report-prime n elapsed-time)
+  (newline)
+  (display n)
+  (display " *** ")
+  (display elapsed-time))
+
+(define (runtime) (current-inexact-milliseconds))
