@@ -1,10 +1,12 @@
 #lang racket
 
-(define (search-for-prime from how-many)
+(define
+  (search-for-prime from how-many)
   (search from how-many)
 )
 
-(define (search from how-many)
+(define
+  (search from how-many)
   (if (= how-many 0)
       (display "Task done")
       (if (odd? from) 
@@ -35,18 +37,19 @@
 
 (define (square n) (* n n))
 
-(define (timed-prime-test n)
+(define
+  (timed-prime-test n)
   (start-prime-test n (runtime)))
 
 (define (start-prime-test n start-time)
-  (if (fast-prime? n 10000)
+  (if (fast-prime? n (- n 1))
       (report-prime n (- (runtime) start-time))
       false))
 
 (define (report-prime n elapsed-time)
+  (newline)
   (display n)
   (display " *** ")
-  (display elapsed-time)
-  (newline))
+  (display elapsed-time))
 
 (define (runtime) (current-inexact-milliseconds))
