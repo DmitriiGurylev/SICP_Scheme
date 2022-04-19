@@ -1,37 +1,38 @@
 #lang racket
 
-(define (square n) (* n n))
+(define (timed-prime-test n)
+  (start-prime-test n))
 
-(define (fast-prime? n times)
-  (cond ((= times 0) true)
-        ((miller-rabin-test n) 
-         (fast-prime? n (- times 1)))
-        (else false)))
+(define (start-prime-test n)
+  (define (fast-prime? n times)
+    (cond ((= times 0) true)
+          ((miller-rabin-test n times) 
+           (fast-prime? n (- times 1)))
+          (else false)))
+  (fast-prime? n (- n 1)))
 
-(define (miller-rabin-test n)
-  (define (try-it a)
-    (= (expmod a (- n 1) n) 1))
-  (try-it (+ 1 (random (- n 1)))))
+(define (miller-rabin-test n times)
+  (= (expmod-new times (- n 1) n) 1))
 
-(define (expmod base exp denominator)
+(define (expmod-new base exp m)
   (cond ((= exp 0) 1)
         ((even? exp)
-         (nontrivial-square-root?
-          (remainder
-           (square (expmod base (/ exp 2) denominator)) denominator) denominator))
-        (else
-         (remainder
-          (* base (expmod base (- exp 1) denominator))
-          denominator))))
+        ; (remainder (square (expmod base (/ exp 2) m)) m))
+         (remainder-or-nontrivial-square-root-check (expmod-new base (/ exp 2) m) m))
+        (else (remainder
+               (* base (expmod-new base (- exp 1) m))
+               m))))
 
-(define (nontrivial-square-root? x n)
+(define (remainder-or-nontrivial-square-root-check rem n)
   (if (and
        (not (or
-             (= x 1)
-             (= x (- n 1))))
-       (= (remainder (square x) n) 1))
+             (= rem 1)
+             (= rem (- n 1))))
+       (= (remainder (square rem) n) 1))
       0
-      x))
+      (remainder (square rem) n)))
+
+(define (square n) (* n n))
 
 
 
