@@ -2,23 +2,35 @@
 
 (define (cube x) (* x x x))
 
+(define (simpsons-rule-integral f a b n)
+  (integral f a b n 0 (find-h a b n)))
+
+(define (integral func a b n counter h)
+  
+  (define (find-next x)
+  (+ x h))
+  
+  (* (sum cube (+ a h) find-next b) h))
+
+(define (find-next a counter h n)
+  (cond
+    ((= counter 0) a)
+    ((= counter n) (+ a (* h counter)))
+    (even? counter) (* 2 (+ a (* h counter)))
+    (* 4 (+ a (* h counter)))))
+
+(define (find-h a b n)
+  (/ (- b a) n))
+
+(define (find-y a n h counter)
+  (cond
+    ((= counter 0) a)
+    ((= counter n) a)
+    (even? counter) (+ a (* 2 h))
+    (+ a (* 4 h))))
+
 (define (sum term a next b)
   (if (> a b)
       0
       (+ (term a)
          (sum term (next a) next b))))
-
-(define (inc n) (+ n 1))
-
-(define (sum-cubes a b)
-  (sum cube a inc b))
-
-(define (identity x) x)
-
-(define (sum-integers a b)
-  (sum identity a inc b))
-
-(define (integral f a b dx)
-  (define (add-dx x) (+ x dx))
-  (* (sum f (+ a (/ dx 2.0)) add-dx b) 
-     dx))
